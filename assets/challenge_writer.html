@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@2.2.0/dist/hanzi-writer.min.js"></script>
+    <title>挑戰模式</title>
+    <style>
+        body {
+          margin: 0;
+          padding: 0;
+          background-color: #FFFDE7;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+        }
+
+        #practice {
+          width: 320px;
+          height: 320px;
+          border: 2px solid #DDD;
+          border-radius: 12px;
+          background-color: #fff;
+          background-image:
+            linear-gradient(to right, transparent 24%, #ccc 25%, transparent 26%, transparent 49%, #ccc 50%, transparent 51%, transparent 74%, #ccc 75%, transparent 76%),
+            linear-gradient(to bottom, transparent 24%, #ccc 25%, transparent 26%, transparent 49%, #ccc 50%, transparent 51%, transparent 74%, #ccc 75%, transparent 76%);
+          background-size: 100% 100%;
+          background-repeat: no-repeat;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body>
+<div id="practice"></div>
+
+<script>
+    let writer;
+
+    function loadCharacter(character) {
+      document.getElementById('practice').innerHTML = '';
+
+      HanziWriter.loadCharacterData(character).then((charData) => {
+        writer = HanziWriter.create('practice', character, {
+          width: 320,
+          height: 320,
+          padding: 10,
+          showCharacter: false,
+          strokeColor: '#2E7D32',
+          radicalColor: '#00897B',
+          showOutline: true,
+          charData: charData,
+        });
+
+        writer.quiz({
+          onComplete: () => sendMessageToFlutter("correct"),
+          onMistake: () => sendMessageToFlutter("incorrect"),
+        });
+
+        // ✅ 自動播放發音
+        if ('speechSynthesis' in window) {
+          const utter = new SpeechSynthesisUtterance(character);
+          utter.lang = 'zh-TW';
+          speechSynthesis.cancel();
+          speechSynthesis.speak(utter);
+        }
+      });
+    }
+
+    function sendMessageToFlutter(message) {
+      if (window.flutter_inappwebview) {
+        window.flutter_inappwebview.callHandler('onResult', message);
+      }
+    }
+     window.onload = () => {
+      loadCharacter('丁');
+    };
+</script>
+</body>
+</html>

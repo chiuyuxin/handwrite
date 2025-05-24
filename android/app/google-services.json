@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "645113443642",
+    "project_id": "handwritten-f4251",
+    "storage_bucket": "handwritten-f4251.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:645113443642:android:debe307c7c7a2244690c03",
+        "android_client_info": {
+          "package_name": "com.example.app1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "645113443642-rmivsj1qpah3dt39c19krkgndiu30o48.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDr9-aE_WguF-HwxnPNmeAt3O9M8_ckkZs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "645113443642-rmivsj1qpah3dt39c19krkgndiu30o48.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "645113443642-4s7gu5snks9aad4uqqep8831jl653mot.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.app1"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

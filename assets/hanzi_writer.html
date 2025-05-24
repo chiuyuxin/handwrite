@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@2.2.0/dist/hanzi-writer.min.js"></script>
+
+    <style>
+        body {
+          margin: 0;
+          padding: 0;
+          font-family: sans-serif;
+          background-color: #FFFDE7;
+        }
+
+        .wrapper {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 24px;
+          text-align: center;
+        }
+
+        #char-title {
+          font-size: 32px;
+          font-weight: bold;
+          margin-bottom: 30px;
+          color: #424242;
+        }
+
+        .main-container {
+          display: flex;
+          justify-content: center;
+          align-items: flex-start;
+          gap: 40px;
+          flex-wrap: wrap;
+        }
+
+        .section {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .box {
+          width: 360px;
+          height: 360px;
+          border: 2px solid #DDD;
+          border-radius: 12px;
+          background-color: #fff;
+          background-image:
+            linear-gradient(to right, transparent 24%, #ccc 25%, transparent 26%, transparent 49%, #ccc 50%, transparent 51%, transparent 74%, #ccc 75%, transparent 76%),
+            linear-gradient(to bottom, transparent 24%, #ccc 25%, transparent 26%, transparent 49%, #ccc 50%, transparent 51%, transparent 74%, #ccc 75%, transparent 76%);
+          background-size: 100% 100%;
+          background-repeat: no-repeat;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        button, select {
+          margin-top: 16px;
+          padding: 10px 20px;
+          font-size: 16px;
+          border: none;
+          background-color: #FFA000;
+          color: white;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+          background-color: #FB8C00;
+        }
+
+        select {
+          background-color: #FFD54F;
+          color: #333;
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <h2 id="char-title">請書寫</h2>
+
+    <div style="margin-bottom: 20px;">
+        <button onclick="playAudio()">🔊 播放發音</button>
+        <select id="speedControl" onchange="changeSpeed()">
+            <option value="slow">快速</option>
+            <option value="medium" selected>中速</option>
+            <option value="fast">慢速</option>
+        </select>
+    </div>
+
+    <div class="main-container">
+        <div class="section">
+            <div id="animation" class="box"></div>
+            <button onclick="replayAnimation()">🔁 重複撥放</button>
+        </div>
+        <div class="section">
+            <div id="practice" class="box"></div>
+            <button onclick="startQuiz()">✍ 筆順練習</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let animationWriter, practiceWriter;
+    let currentChar = "丁";
+    let currentSpeed = 1.0;
+
+    function loadCharacter(character) {
+      currentChar = character;
+      document.getElementById('char-title').innerText = `請書寫: ${character}`;
+      document.getElementById('animation').innerHTML = '';
+      document.getElementById('practice').innerHTML = '';
+
+      HanziWriter.loadCharacterData(character).then((charData) => {
+        animationWriter = HanziWriter.create('animation', character, {
+          width: 360,
+          height: 360,
+          padding: 10,
+          showCharacter: false,
+          strokeColor: '#4E342E',
+          radicalColor: '#039BE5',
+          showOutline: true,
+          strokeAnimationSpeed: 1 / currentSpeed,
+          charData: charData,
+        });
+
+        practiceWriter = HanziWriter.create('practice', character, {
+          width: 360,
+          height: 360,
+          padding: 10,
+          showCharacter: false,
+          strokeColor: '#2E7D32',
+          radicalColor: '#00897B',
+          showOutline: true,
+          charData: charData,
+        });
+
+        animationWriter.animateCharacter();
+        startQuiz(); // 自動開始練習
+
+
+        if ('speechSynthesis' in window) {
+          const utter = new SpeechSynthesisUtterance(character);
+          utter.lang = 'zh-TW';
+          speechSynthesis.cancel();
+          speechSynthesis.speak(utter);
+        }
+      });
+    }
+
+    function changeSpeed() {
+      const value = document.getElementById("speedControl").value;
+      currentSpeed = value === "slow" ? 0.5 : value === "fast" ? 2.0 : 1.0;
+      loadCharacter(currentChar);
+    }
+
+    function replayAnimation() {
+      if (animationWriter) {
+        animationWriter.animateCharacter();
+      }
+    }
+
+    function startQuiz() {
+      if (!practiceWriter) return;
+      practiceWriter.quiz({
+        onComplete: () => sendMessageToFlutter("correct"),
+        onMistake: () => sendMessageToFlutter("incorrect"),
+      });
+    }
+
+    function playAudio() {
+      const audio = new Audio(`https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&q=${currentChar}&tl=zh-TW`);
+      audio.play();
+    }
+
+    function sendMessageToFlutter(message) {
+      if (window.flutter_inappwebview) {
+        window.flutter_inappwebview.callHandler('onResult', message);
+      }
+    }
+</script>
+</body>
+</html>
