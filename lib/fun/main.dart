@@ -51,7 +51,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/splash', // 設定初始頁面為登入頁
       routes: {
         '/splash': (context) => SplashPage(),
-        '/login': (context) => HomePage1(),
+        '/login': (context) => LoginPage(),
         '/register': (context) => RegisterPage(),
         '/profile': (context) => ProfilePage(),
         '/home': (context) => HomePage1(), // 當用戶登入後顯示個人資料頁面
